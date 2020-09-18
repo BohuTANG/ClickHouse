@@ -1834,7 +1834,7 @@ void MergeTreeData::renameTempPartAndAdd(MutableDataPartPtr & part, SimpleIncrem
 
 void MergeTreeData::renameTempPartAndReplace(
     MutableDataPartPtr & part, SimpleIncrement * increment, Transaction * out_transaction,
-    std::unique_lock<std::mutex> & lock, DataPartsVector * out_covered_parts)
+    std::unique_lock<std::mutex> & lock, DataPartsVector * out_covered_parts, bool share_storage)
 {
     if (out_transaction && &out_transaction->data != this)
         throw Exception("MergeTreeData::Transaction for one table cannot be used with another. It is a bug.",
@@ -1897,7 +1897,8 @@ void MergeTreeData::renameTempPartAndReplace(
     part->info = part_info;
     part->is_temp = false;
     part->state = DataPartState::PreCommitted;
-    part->renameTo(part_name, true);
+    if (!share_storage)
+        part->renameTo(part_name, true);
 
     auto part_it = data_parts_indexes.insert(part).first;
 
@@ -1934,7 +1935,7 @@ void MergeTreeData::renameTempPartAndReplace(
 }
 
 MergeTreeData::DataPartsVector MergeTreeData::renameTempPartAndReplace(
-    MutableDataPartPtr & part, SimpleIncrement * increment, Transaction * out_transaction)
+    MutableDataPartPtr & part, SimpleIncrement * increment, Transaction * out_transaction, bool share_storage)
 {
     if (out_transaction && &out_transaction->data != this)
         throw Exception("MergeTreeData::Transaction for one table cannot be used with another. It is a bug.",
@@ -1943,7 +1944,7 @@ MergeTreeData::DataPartsVector MergeTreeData::renameTempPartAndReplace(
     DataPartsVector covered_parts;
     {
         auto lock = lockParts();
-        renameTempPartAndReplace(part, increment, out_transaction, lock, &covered_parts);
+        renameTempPartAndReplace(part, increment, out_transaction, lock, &covered_parts, share_storage);
     }
     return covered_parts;
 }

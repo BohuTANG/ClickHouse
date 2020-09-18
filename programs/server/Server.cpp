@@ -361,7 +361,7 @@ int Server::main(const std::vector<std::string> & /*args*/)
 
     global_context->setPath(path);
 
-    StatusFile status{path + "status", StatusFile::write_full_info};
+    //StatusFile status{path + "status", StatusFile::write_full_info};
 
     SCOPE_EXIT({
         /** Ask to cancel background jobs all table engines,

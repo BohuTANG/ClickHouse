@@ -432,12 +432,12 @@ public:
     /// Returns all parts covered by the added part (in ascending order).
     /// If out_transaction == nullptr, marks covered parts as Outdated.
     DataPartsVector renameTempPartAndReplace(
-        MutableDataPartPtr & part, SimpleIncrement * increment = nullptr, Transaction * out_transaction = nullptr);
+        MutableDataPartPtr & part, SimpleIncrement * increment = nullptr, Transaction * out_transaction = nullptr, bool share_storage = false);
 
     /// Low-level version of previous one, doesn't lock mutex
     void renameTempPartAndReplace(
             MutableDataPartPtr & part, SimpleIncrement * increment, Transaction * out_transaction, DataPartsLock & lock,
-            DataPartsVector * out_covered_parts = nullptr);
+            DataPartsVector * out_covered_parts = nullptr, bool share_storage = false);
 
     /// Removes parts from the working set parts.
     /// Parts in add must already be in data_parts with PreCommitted, Committed, or Outdated states.

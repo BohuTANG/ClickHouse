@@ -3282,7 +3282,12 @@ bool StorageReplicatedMergeTree::fetchPart(const String & part_name, const Stora
         if (!to_detached)
         {
             Transaction transaction(*this);
-            renameTempPartAndReplace(part, nullptr, &transaction);
+            // share_storage
+            /**
+             * share_storage should be determined by the config:
+             * <share_storage>true</share_storage>
+             */
+            renameTempPartAndReplace(part, nullptr, &transaction, true);
 
             /** NOTE
               * Here, an error occurs if ALTER occurred with a change in the column type or column deletion,
